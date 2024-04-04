@@ -59,9 +59,9 @@ history = model.fit(X_train, y_train,
                     verbose=1)
 
 history_dict = history.history
-loss_values = history_dict['loss'] # you can change this
-val_loss_values = history_dict['val_loss'] # you can also change this
-epochs = range(1, len(loss_values) + 1) # range of X (no. of epochs)
+loss_values = history_dict['loss']
+val_loss_values = history_dict['val_loss']
+epochs = range(1, len(loss_values) + 1)
 plt.plot(epochs, loss_values, 'bo', label='Training loss')
 plt.plot(epochs, val_loss_values, 'orange', label='Validation loss')
 plt.title('Training and validation loss')
@@ -70,27 +70,21 @@ plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
-fig, axes = plt.subplots(1,2) # 1 row, 2 columns
+fig, axes = plt.subplots(1,2)
 
-# this makes the individual subplots
-# Training Results
-axes[0].scatter(x=y_train, y=model.predict(X_train)) #first row, first entry (left top)
+axes[0].scatter(x=y_train, y=model.predict(X_train))
 axes[0].set_xlabel("Actual", fontsize=10)
 axes[0].set_ylabel("Predicted",  fontsize=10)
 axes[0].set_title("Training")
-# add 45 deg line
 x = np.linspace(*axes[0].get_xlim())
 axes[0].plot(x, x, color='red')
-# Validation Results
-axes[1].scatter(x=y_test, y=model.predict(X_test)) # first row, second entry (right top)
+axes[1].scatter(x=y_test, y=model.predict(X_test))
 axes[1].set_xlabel("Actual", fontsize=10)
 axes[1].set_ylabel("Predicted",  fontsize=10)
 axes[1].set_title("Validation")
-# add 45 deg line
 x = np.linspace(*axes[1].get_xlim())
 axes[1].plot(x, x, color='red')
 
-# tight layout
 fig.tight_layout()
 
 # show the plot
@@ -102,6 +96,10 @@ pred
 trainpreds = model.predict(X_train)
 
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+
+print(mean_squared_error(y_train, trainpreds))
+print(mean_squared_error(y_test, pred))
 print(mean_absolute_error(y_train, trainpreds)) # train
 print(mean_absolute_error(y_test, pred)) # test
 
@@ -109,14 +107,15 @@ from keras.layers import Dense, Dropout
 
 # Insert the dropout layer
 model = Sequential()
-model.add(Dense(1000, input_shape=(X_train.shape[1],), activation='relu'))
+model.add(Dense(1000, input_shape=(X_train.shape[1],), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
 model.add(Dropout(0.2))
-model.add(Dense(500, activation='relu'))
+model.add(Dense(500, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
 model.add(Dropout(0.2)) 
-model.add(Dense(250, activation='relu'))
+model.add(Dense(250, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
 model.add(Dropout(0.2))
-model.add(Dense(1, activation='linear')) 
+model.add(Dense(1, activation='linear', kernel_regularizer=regularizers.l2(0.01))) 
 model.summary() 
+
 X_NEW = np.array([[455594,	2101042,	294422,	256863,	321031,	856616,	591153,	451,	653,	1493,	1538,	1566,	800722,	704107,	898541]])
 X_NEW_scaled = scaler.transform(X_NEW)
 pred_2 = model.predict(X_NEW_scaled)
